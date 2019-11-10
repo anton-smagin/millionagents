@@ -9,8 +9,17 @@ class PhoneCharacterEscaper < AbstractCharacterEscaper # :nodoc:
   end
 
   def escape_phone(phone, escape_symbol, escape_length)
+    escaped_phone = escape_last_digits(phone, escape_symbol, escape_length)
+    delete_multiple_spaces(escaped_phone)
+  end
+
+  def delete_multiple_spaces(phone)
+    phone.gsub(/[ ]{2,}/, " ")
+  end
+
+  def escape_last_digits(phone, escape_symbol, escape_length)
     escaped_symbols = 0
-    escaped_phone = phone.split("").reverse.map do |symbol|
+    phone.split("").reverse.map do |symbol|
       if escaped_symbols < escape_length && symbol =~ /\d/
         escaped_symbols += 1
         escape_symbol
@@ -18,7 +27,6 @@ class PhoneCharacterEscaper < AbstractCharacterEscaper # :nodoc:
         symbol
       end
     end.reverse.join
-    escaped_phone.gsub(/[ ]{2,}/, " ")
   end
 
   def validation_regexp
